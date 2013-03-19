@@ -88,13 +88,3 @@
 
     box.StringBuilder = StringBuilder;
 })(this);
-
-
-<ul>
-<li>,function () { return count += 1; },.- list item</li>
-<li>,function () { return count += 1; },.- list item</li>
-<li>,function () { return count += 1; },.- list item</li>
-<li>,function () { return count += 1; },.- list item</li>
-<li>,function () { return count += 1; },.- list item</li>
-
-
