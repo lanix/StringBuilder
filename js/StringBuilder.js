@@ -1,13 +1,17 @@
 (function(box){
 
     var StringBuilder = function(){
-        return (this === box ? new StringBuilder() : this);
+        var that = this === box ? new StringBuilder() : this;
+
+        return that;
     };
 
     StringBuilder.prototype = {
         buffer : [],
-        prefix : null,
-        suffix : null,
+        myStack : function(){
+            return ModularStack();
+        }(),
+        wrapping : false,
         cat : function(){
             var currentArgument = null;
             for(var i = 0; i < arguments.length; i += 1){
@@ -15,18 +19,48 @@
 
                 switch(typeof currentArgument){
                     case 'function' : {
+                        if(this.wrapping){
+                            this.wrapping = false;
+                            this.cat(this.myStack.peek().preffix);
+                            this.wrapping = true;
+                        }
                         this.buffer.push(currentArgument.call(this));
+                        if(this.wrapping){
+                            this.wrapping = false;
+                            this.cat(this.myStack.peek().suffix);
+                            this.wrapping = true;
+                        }
                         break;
                     }
                     case 'string' : {
+                        if(this.wrapping){
+                            this.wrapping = false;
+                            this.cat(this.myStack.peek().preffix);
+                            this.wrapping = true;
+                        }
                         this.buffer.push(currentArgument);
+                        if(this.wrapping){
+                            this.wrapping = false;
+                            this.cat(this.myStack.peek().suffix);
+                            this.wrapping = true;
+                        }
                         break;
                     }
                     case 'number' : {
+                        if(this.wrapping){
+                            this.wrapping = false;
+                            this.cat(this.myStack.peek().preffix);
+                            this.wrapping = true;
+                        }
                         this.buffer.push(currentArgument.toString());
+                        if(this.wrapping){
+                            this.wrapping = false;
+                            this.cat(this.myStack.peek().suffix);
+                            this.wrapping = true;
+                        }
                         break;
                     }
-                    case 'object' :{
+                    case 'object' :{                
                         if(currentArgument instanceof Array){
                             for(var arrayIndex = 0; arrayIndex < currentArgument.length; arrayIndex += 1){
                                 this.cat(currentArgument[arrayIndex]);
@@ -74,9 +108,26 @@
             return this.buffer.join("");
         },
         wrap : function(p, s){
-            this.prefix = p;
-            this.suffix = s;
-
+            this.myStack.push({preffix:p, suffix:s});
+            this.wrapping = true;
+            return this;
+        },
+        end: function(deep){
+            if(deep && typeof(deep) === 'number'){
+                for(var i = 0; i < deep; i += 1){
+                    try{
+                         this.myStack.pop();
+                    }
+                    catch(err){
+                        this.wrapping = false;
+                        break;
+                    }    
+                }
+            }
+            else{
+                this.myStack.pop();
+                if(this.myStack.isEmpty()) this.wrapping = false;
+            }
             return this;
         },
         content : function(){
