@@ -8,67 +8,61 @@
 
     StringBuilder.prototype = {
         buffer : [],
-        myStack : function(){
-            return ModularStack();
-        }(),
+        myStack : [],
+        myStackBackup : [],
         wrapping : false,
         cat : function(){
             var currentArgument = null;
+            var prefix = null;
+            var suffix = null;
+
+            if(arguments.callee.caller !== this.cat && this.wrapping){
+                this.wrapping = false;
+                if(this.myStack.length > 0){
+                    for(var i = 0; i < this.myStack.length; i += 1){
+                        prefix = this.myStack[i].prefix;
+                        if(prefix) this.cat(prefix);
+                    }
+                } 
+                this.wrapping = true;
+            }
+
             for(var i = 0; i < arguments.length; i += 1){
                currentArgument = arguments[i];
 
+               console.log(currentArgument);
+
                 switch(typeof currentArgument){
                     case 'function' : {
-                        if(this.wrapping){
-                            this.wrapping = false;
-                            this.cat(this.myStack.peek().prefix);
-                            this.wrapping = true;
-                        }
                         this.buffer.push(currentArgument.call(this));
-                        if(this.wrapping){
-                            this.wrapping = false;
-                            this.cat(this.myStack.peek().suffix);
-                            this.wrapping = true;
-                        }
                         break;
                     }
                     case 'string' : {
-                        if(this.wrapping){
-                            this.wrapping = false;
-                            this.cat(this.myStack.peek().prefix);
-                            this.wrapping = true;
-                        }
                         this.buffer.push(currentArgument);
-                        if(this.wrapping){
-                            this.wrapping = false;
-                            this.cat(this.myStack.peek().suffix);
-                            this.wrapping = true;
-                        }
                         break;
                     }
                     case 'number' : {
-                        if(this.wrapping){
-                            this.wrapping = false;
-                            this.cat(this.myStack.peek().prefix);
-                            this.wrapping = true;
-                        }
                         this.buffer.push(currentArgument.toString());
-                        if(this.wrapping){
-                            this.wrapping = false;
-                            this.cat(this.myStack.peek().suffix);
-                            this.wrapping = true;
-                        }
                         break;
                     }
-                    case 'object' :{                
-                        if(currentArgument instanceof Array){
-                            for(var arrayIndex = 0; arrayIndex < currentArgument.length; arrayIndex += 1){
-                                this.cat(currentArgument[arrayIndex]);
-                            }
+                    case 'object' :{        
+                        if(myHelper.isArray(currentArgument)){
+                            this.cat.apply(this, currentArgument);
                         }
                     }
                     default: break;
                 }
+            }
+
+            if(arguments.callee.caller !== this.cat && this.wrapping){
+                this.wrapping = false;
+                if(this.myStack.length > 0){
+                    for(var i = this.myStack.length - 1; i >= 0; i -= 1){
+                        suffix = this.myStack[i].suffix;
+                        if(suffix)this.cat(suffix);
+                    }
+                } 
+                this.wrapping = true;
             }
 
             return this;
@@ -113,6 +107,7 @@
             return this;
         },
         end: function(deep){
+
             if(deep && typeof(deep) === 'number'){
                 for(var i = 0; i < deep; i += 1){
                     try{
@@ -126,8 +121,20 @@
             }
             else{
                 this.myStack.pop();
-                if(this.myStack.isEmpty()) this.wrapping = false;
+                if(this.myStack.length <= 0){
+                    this.wrapping = false;
+                } 
+                else {
+                    this.wrapping = true;
+                }
             }
+
+            if(this.myStackBackup.length > 0) {
+                this.myStack = this.myStackBackup.slice();
+                console.log(this.myStack);
+                this.myStackBackup = [];
+            }
+
             return this;
         },
         prefix : function(p){
@@ -143,16 +150,20 @@
         each : function(args, callBack){
 
             for(var i = 0; i < args.length; i += 1){
-                callBack.call(this, value=args[i]);
+                callBack.call(this, args[i], i);
             }
 
             return this;
 
         },
-        content : function(){
-            for(var i = 0; i < this.buffer.length; i += 1){
-                console.log(this.buffer[i]); 
-            }
+        suspend : function(){
+            this.myStackBackup = this.myStack.slice(0);
+            console.log(this.myStackBackup);
+            this.myStack = [];
+            return this;
+        },
+        content : function(){ //Deleteme
+            console.log(myHelper.isArray([1, 2]));
         }
     }
 
