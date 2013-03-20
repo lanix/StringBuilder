@@ -30,8 +30,6 @@
             for(var i = 0; i < arguments.length; i += 1){
                currentArgument = arguments[i];
 
-               console.log(currentArgument);
-
                 switch(typeof currentArgument){
                     case 'function' : {
                         this.buffer.push(currentArgument.call(this));
@@ -131,7 +129,6 @@
 
             if(this.myStackBackup.length > 0) {
                 this.myStack = this.myStackBackup.slice();
-                console.log(this.myStack);
                 this.myStackBackup = [];
             }
 
@@ -158,7 +155,6 @@
         },
         suspend : function(){
             this.myStackBackup = this.myStack.slice(0);
-            console.log(this.myStackBackup);
             this.myStack = [];
             return this;
         },
