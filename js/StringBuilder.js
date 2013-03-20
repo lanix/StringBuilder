@@ -21,7 +21,7 @@
                     case 'function' : {
                         if(this.wrapping){
                             this.wrapping = false;
-                            this.cat(this.myStack.peek().preffix);
+                            this.cat(this.myStack.peek().prefix);
                             this.wrapping = true;
                         }
                         this.buffer.push(currentArgument.call(this));
@@ -35,7 +35,7 @@
                     case 'string' : {
                         if(this.wrapping){
                             this.wrapping = false;
-                            this.cat(this.myStack.peek().preffix);
+                            this.cat(this.myStack.peek().prefix);
                             this.wrapping = true;
                         }
                         this.buffer.push(currentArgument);
@@ -49,7 +49,7 @@
                     case 'number' : {
                         if(this.wrapping){
                             this.wrapping = false;
-                            this.cat(this.myStack.peek().preffix);
+                            this.cat(this.myStack.peek().prefix);
                             this.wrapping = true;
                         }
                         this.buffer.push(currentArgument.toString());
@@ -108,7 +108,7 @@
             return this.buffer.join("");
         },
         wrap : function(p, s){
-            this.myStack.push({preffix:p, suffix:s});
+            this.myStack.push({prefix:p, suffix:s});
             this.wrapping = true;
             return this;
         },
@@ -129,6 +129,25 @@
                 if(this.myStack.isEmpty()) this.wrapping = false;
             }
             return this;
+        },
+        prefix : function(p){
+            this.myStack.push({prefix:p});
+            this.wrapping = true;
+            return this;
+        },
+        suffix : function(s){
+            this.myStack.push({suffix:s});
+            this.wrapping = true;
+            return this;
+        },
+        each : function(args, callBack){
+
+            for(var i = 0; i < args.length; i += 1){
+                callBack.call(this, value=args[i]);
+            }
+
+            return this;
+
         },
         content : function(){
             for(var i = 0; i < this.buffer.length; i += 1){
