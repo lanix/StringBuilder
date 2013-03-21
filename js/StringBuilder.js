@@ -43,7 +43,7 @@
                         this.buffer.push(currentArgument.toString());
                         break;
                     }
-                    case 'object' :{        
+                    case 'object' : {        
                         if(myHelper.isArray(currentArgument)){
                             this.cat.apply(this, currentArgument);
                         }
@@ -158,9 +158,16 @@
             this.myStack = [];
             return this;
         },
-        content : function(){ //Deleteme
-            console.log(myHelper.isArray([1, 2]));
-        }
+        when : function(condition, thenArgs, otherwiseArgs){
+            var realArgs = null;
+
+            if(typeof condition === 'function') condition = condition.call(this);
+
+            realArgs = condition === true ? thenArgs : otherwiseArgs;
+            this.cat.call(this, realArgs);
+
+            return this;
+        },
     }
 
     box.StringBuilder = StringBuilder;
