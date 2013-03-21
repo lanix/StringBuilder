@@ -2,15 +2,15 @@
 
     var StringBuilder = function(){
         var that = this === box ? new StringBuilder() : this;
+        that.buffer = [];
+        that.myStack = [];
+        that.myStackBackup = [];
+        that.wrapping = false;
 
         return that;
     };
 
     StringBuilder.prototype = {
-        buffer : [],
-        myStack : [],
-        myStackBackup : [],
-        wrapping : false,
         cat : function(){
             var currentArgument = null;
             var prefix = null;
@@ -73,7 +73,7 @@
                 args.splice(args.length - 1, 1);
                 
                 for(var i = 0; i < times; i += 1){
-                    this.cat(args);
+                    this.cat.apply(this, args);
                 }
             } 
             else{
@@ -91,7 +91,7 @@
 
             if(typeof condition === 'boolean' && condition === true){
                 args.splice(args.length - 1, 1);
-                this.cat(args);
+                this.cat.apply(this, args);
             }
 
             return this;
