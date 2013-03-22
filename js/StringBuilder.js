@@ -1,16 +1,7 @@
 (function(box){
 
 
-    var isArray = null;
-
-    if(Array.isArray) {
-        isArray = Array.isArray;
-    }
-    else { 
-        isArray = function (value) {
-            return Object.prototype.toString.apply(value) === '[object Array]';
-        } 
-    }
+    var isArray = Array.isArray || function (value) { return Object.prototype.toString.apply(value) === '[object Array]'; };
 
     var StringBuilder = function(){
         var that = this === box ? new StringBuilder() : this;
