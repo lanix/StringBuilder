@@ -53,9 +53,9 @@
                         if(box.isArray(currentArgument)){
                             this.cat.apply(this, currentArgument);
                         }
-                        // else{
-                        //     this.buffer.push(currentArgument);
-                        // }
+                        else{
+                            this.buffer.push(currentArgument);
+                        }
                         break;
                     }
                     default: 
@@ -90,7 +90,7 @@
                 }
             } 
             else{
-                throw "Missing repetition argument";
+                throw 'Missing repetition argument';
             }
            
             return this;
@@ -112,7 +112,7 @@
             return this;
         },
         string : function(){
-            return this.buffer.join("");
+            return this.buffer.join('');
         },
         wrap : function(p, s){
             this.wrappingStack.push({prefix:p, suffix:s});
